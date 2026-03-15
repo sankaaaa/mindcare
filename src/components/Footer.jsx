@@ -23,8 +23,8 @@ function Footer() {
 
                 <div className={styles.contactInfo}>
                     <h3>Зв'язатися з нами</h3>
-                    <a href="mailto:sanka@jetmonsters.me" className={styles.contactEmail}>
-                        ryan@jetmonsters.me
+                    <a href="mailto:mindcare_platform@ukr.net" className={styles.contactEmail}>
+                        mindcare_platform@ukr.net
                     </a>
                 </div>
 
