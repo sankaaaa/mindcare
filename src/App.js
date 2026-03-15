@@ -12,6 +12,8 @@ import {NextUIProvider} from "@nextui-org/react";
 import {ThemeProvider as NextThemesProvider} from "next-themes";
 import TherapistResults from "./pages/TherapistResults";
 import TherUserPage from "./pages/TherUserPage";
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import TermsOfUsePage from './pages/TermsOfUsePage';
 
 function App() {
     return (
@@ -29,6 +31,8 @@ function RoutesComponent() {
     return (
         <Routes>
             <Route path="/main" element={<MainPage/>}/>
+            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+            <Route path="/terms-of-use" element={<TermsOfUsePage />} />
             <Route path="/login" element={<LoginPage/>}/>
             <Route path="/forgot-password" element={<ResetPasswordPage/>}/>
             <Route path="/create-account" element={<CreateAccount/>}/>
