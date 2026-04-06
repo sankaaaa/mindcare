@@ -13,7 +13,7 @@ const UserPage = () => {
     const [isEditing, setIsEditing] = useState(false);
 
     const navigate = useNavigate();
-    const storedPatientId = localStorage.getItem('patient_id');
+    const storedPatientId = sessionStorage.getItem('patient_id');
 
     useEffect(() => {
         fetchPatientData();
@@ -222,15 +222,11 @@ const UserPage = () => {
                 return;
             }
 
-            // 3. Чистимо localStorage / sessionStorage
-            localStorage.removeItem('status');
-            localStorage.removeItem('patient_id');
-            localStorage.removeItem('doctor_id');
-            localStorage.removeItem('email');
-
+            // 3. Чистимо sessionStorage
             sessionStorage.removeItem('status');
             sessionStorage.removeItem('patient_id');
             sessionStorage.removeItem('doctor_id');
+            sessionStorage.removeItem('email');
 
             // 4. Перекидаємо на логін
             alert("Обліковий запис успішно видалено.");

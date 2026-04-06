@@ -102,10 +102,10 @@ const CreateAccount = () => {
 
                 if (insertError) throw insertError;
 
-                // Зберігаємо ідентифікатори в localStorage
-                localStorage.setItem("email", formData.email);
-                localStorage.setItem("patient_id", nextPatientId);
-                localStorage.setItem("status", "patient");
+                // Зберігаємо ідентифікатори в sessionStorage
+                sessionStorage.setItem("email", formData.email);
+                sessionStorage.setItem("patient_id", nextPatientId);
+                sessionStorage.setItem("status", "patient");
 
             } else if (formData.role === 'doctor') {
                 // ===== РЕЄСТРАЦІЯ СПЕЦІАЛІСТА =====
@@ -141,9 +141,9 @@ const CreateAccount = () => {
 
                 if (insertError) throw insertError;
 
-                localStorage.setItem("email", formData.email);
-                localStorage.setItem("doctor_id", nextDoctorId);
-                localStorage.setItem("status", "doctor");
+                sessionStorage.setItem("email", formData.email);
+                sessionStorage.setItem("doctor_id", nextDoctorId);
+                sessionStorage.setItem("status", "doctor");
             }
 
             // Спроба надіслати вітальний лист (не ламаємо реєстрацію, якщо лист не відправився)

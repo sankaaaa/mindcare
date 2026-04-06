@@ -18,7 +18,7 @@ const TherCalendar = () => {
     const [isPatient, setIsPatient] = useState(false);
 
     useEffect(() => {
-        const status = localStorage.getItem("status");
+        const status = sessionStorage.getItem("status");
         setIsPatient(status === "patient");
     }, []);
 
@@ -166,7 +166,7 @@ const TherCalendar = () => {
     };
 
     const handleConfirmSession = async () => {
-        const patientId = localStorage.getItem("patient_id");
+        const patientId = sessionStorage.getItem("patient_id");
 
         if (!patientId) {
             alert("Patient ID не знайдено!");

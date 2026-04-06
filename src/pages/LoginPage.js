@@ -26,8 +26,8 @@ const LoginPage = () => {
 
                 if (data.length === 1) {
                     console.log('Лікар увійшов успішно: ', data[0]);
-                    localStorage.setItem('doctor_id', data[0].doctor_id);
-                    localStorage.setItem('status', 'doctor');
+                    sessionStorage.setItem('doctor_id', data[0].doctor_id);
+                    sessionStorage.setItem('status', 'doctor');
                     navigate('/main');
                 } else {
                     const {data: patientData, error: patientError} = await supabase
@@ -44,24 +44,24 @@ const LoginPage = () => {
                         const patient = patientData[0];
                         console.log('Пацієнт увійшов успішно: ', patient);
 
-                        localStorage.setItem('patient_id', patient.patient_id);
-                        localStorage.setItem('status', 'patient');
-                        localStorage.setItem('email', patient.email);
-                        localStorage.setItem('patient_name', `${patient.first_name} ${patient.last_name}`);
+                        sessionStorage.setItem('patient_id', patient.patient_id);
+                        sessionStorage.setItem('status', 'patient');
+                        sessionStorage.setItem('email', patient.email);
+                        sessionStorage.setItem('patient_name', `${patient.first_name} ${patient.last_name}`);
 
                         navigate('/main');
                     }
                     else {
                         setError('Невірний логін або пароль');
-                        localStorage.removeItem('patient_id');
-                        localStorage.removeItem('doctor_id');
+                        sessionStorage.removeItem('patient_id');
+                        sessionStorage.removeItem('doctor_id');
                     }
                 }
             } catch (error) {
                 console.error('Помилка при логіні: ', error.message);
                 setError('Сталася помилка при вході');
-                localStorage.removeItem('patient_id');
-                localStorage.removeItem('doctor_id');
+                sessionStorage.removeItem('patient_id');
+                sessionStorage.removeItem('doctor_id');
             }
         } else {
             setError('Будь ласка, введіть всі дані');

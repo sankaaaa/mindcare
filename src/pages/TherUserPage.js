@@ -12,24 +12,24 @@ const TherUserPage = () => {
     const { doctor_id } = useParams();
     const navigate = useNavigate();
 
-    const storedDoctorId = localStorage.getItem('doctor_id');
+    const storedDoctorId = sessionStorage.getItem('doctor_id');
     const resolvedDoctorId = storedDoctorId || doctor_id;
 
     const [doctorData, setDoctorData] = useState(null);
     const [activeTab, setActiveTab] = useState(() => {
-        return localStorage.getItem('therapist_active_tab') || 'general';
+        return sessionStorage.getItem('therapist_active_tab') || 'general';
     });
     const [isEditing, setIsEditing] = useState(false);
     const [editedDoctor, setEditedDoctor] = useState({});
 
     useEffect(() => {
-        localStorage.setItem('therapist_active_tab', activeTab);
+        sessionStorage.setItem('therapist_active_tab', activeTab);
     }, [activeTab]);
 
     useEffect(() => {
         const fetchDoctorData = async () => {
             if (!resolvedDoctorId) {
-                console.error('Doctor ID не знайдено ні в localStorage, ні в URL');
+                console.error('Doctor ID не знайдено ні в sessionStorage, ні в URL');
                 alert('Не вдалося завантажити дані лікаря.');
                 return;
             }
@@ -103,11 +103,11 @@ const TherUserPage = () => {
                 return;
             }
 
-            localStorage.removeItem('status');
-            localStorage.removeItem('patient_id');
-            localStorage.removeItem('doctor_id');
-            localStorage.removeItem('email');
-            localStorage.removeItem('therapist_active_tab');
+            sessionStorage.removeItem('status');
+            sessionStorage.removeItem('patient_id');
+            sessionStorage.removeItem('doctor_id');
+            sessionStorage.removeItem('email');
+            sessionStorage.removeItem('therapist_active_tab');
 
             sessionStorage.removeItem('status');
             sessionStorage.removeItem('patient_id');

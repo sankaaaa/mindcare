@@ -7,7 +7,7 @@ import {Button} from '@nextui-org/react';
 
 function Header() {
     const navigate = useNavigate();
-    const status = localStorage.getItem('status');
+    const status = sessionStorage.getItem('status');
 
     const handleAllTherapists = () => {
         navigate('/all-therapists');
@@ -18,7 +18,7 @@ function Header() {
     };
 
     const handleMyPage = () => {
-        const patientId = localStorage.getItem('patient_id');
+        const patientId = sessionStorage.getItem('patient_id');
         if (patientId) {
             navigate(`/my-account/${patientId}`);
         } else {
@@ -28,7 +28,7 @@ function Header() {
     };
 
     const handleMyDocPage = () => {
-        const doctorId = localStorage.getItem('doctor_id');
+        const doctorId = sessionStorage.getItem('doctor_id');
         if (doctorId) {
             navigate(`/my-doc-account/${doctorId}`);
         } else {
@@ -49,12 +49,12 @@ function Header() {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('status');
-        localStorage.removeItem('patient_id');
-        localStorage.removeItem('doctor_id');
         sessionStorage.removeItem('status');
         sessionStorage.removeItem('patient_id');
         sessionStorage.removeItem('doctor_id');
+        sessionStorage.removeItem('email');
+        sessionStorage.removeItem('patient_name');
+        sessionStorage.removeItem('therapist_active_tab');
         navigate('/login');
     };
 
