@@ -232,9 +232,9 @@ const TherUserPage = () => {
                                                         setEditedDoctor({...editedDoctor, doc_sex: e.target.value})
                                                     }
                                                 >
-                                                    <option value="male">Чоловік</option>
-                                                    <option value="female">Жінка</option>
-                                                    <option value="another">Інше</option>
+                                                    <option value="Чоловік">Чоловік</option>
+                                                    <option value="Жінка">Жінка</option>
+                                                    <option value="Інше">Інше</option>
                                                 </select>
                                             ) : doctorData.doc_sex}
                                         </p>

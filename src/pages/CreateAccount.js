@@ -7,7 +7,7 @@ import supabase from '../config/databaseClient';
 const CreateAccount = () => {
     const [currentStep, setCurrentStep] = useState(1);
     const [formData, setFormData] = useState({
-        role: '',          // 'patient' або 'doctor'
+        role: '',
         firstName: '',
         lastName: '',
         gender: '',
@@ -17,30 +17,61 @@ const CreateAccount = () => {
         address: '',
         login: '',
         password: '',
+        pricePerSession: '',
+        specializations: [],
     });
+
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
     const handleChange = (e) => {
-        const {name, value, type, checked} = e.target;
+        const {name, value} = e.target;
         setFormData(prev => ({
             ...prev,
-            [name]: type === 'checkbox' ? checked : value,
+            [name]: value,
         }));
     };
 
+    const handleSpecializationChange = (value) => {
+        setFormData(prev => {
+            const exists = prev.specializations.includes(value);
+
+            return {
+                ...prev,
+                specializations: exists
+                    ? prev.specializations.filter(item => item !== value)
+                    : [...prev.specializations, value]
+            };
+        });
+    };
+
     const nextStep = () => {
-        // мінімальна валідація по кроках
         if (currentStep === 1) {
             if (!formData.role) {
                 return setError("Будь ласка, оберіть тип акаунту.");
             }
+
             if (!formData.firstName || !formData.lastName || !formData.gender || !formData.birthDate) {
                 return setError("Заповніть всі поля цього кроку.");
             }
         }
+
         if (currentStep === 2) {
-            if (!formData.email || !formData.phone || !formData.address) {
+            if (formData.role === 'patient') {
+                if (!formData.email || !formData.phone || !formData.address) {
+                    return setError("Заповніть всі поля цього кроку.");
+                }
+            }
+
+            if (formData.role === 'doctor') {
+                if (!formData.email || !formData.phone || formData.specializations.length === 0) {
+                    return setError("Заповніть поля та виберіть хоча б одну спеціалізацію.");
+                }
+            }
+        }
+
+        if (currentStep === 3 && formData.role === 'doctor') {
+            if (!formData.login || !formData.password) {
                 return setError("Заповніть всі поля цього кроку.");
             }
         }
@@ -59,18 +90,17 @@ const CreateAccount = () => {
         setError('');
 
         if (!formData.role) {
-            setError("Будь ласка, оберіть тип акаунту (студент чи спеціаліст).");
+            setError("Будь ласка, оберіть тип акаунту.");
             return;
         }
 
         let genderInEnglish = '';
-        if (formData.gender === 'male') genderInEnglish = 'male';
-        else if (formData.gender === 'female') genderInEnglish = 'female';
-        else if (formData.gender === 'another') genderInEnglish = 'another';
+        if (formData.gender === 'Чоловік') genderInEnglish = 'male';
+        else if (formData.gender === 'Жінка') genderInEnglish = 'female';
+        else if (formData.gender === 'Інше') genderInEnglish = 'another';
 
         try {
             if (formData.role === 'patient') {
-                // ===== РЕЄСТРАЦІЯ СТУДЕНТА =====
                 const {data: lastPatient, error: lastPatientError} = await supabase
                     .from('patients')
                     .select('patient_id')
@@ -102,13 +132,10 @@ const CreateAccount = () => {
 
                 if (insertError) throw insertError;
 
-                // Зберігаємо ідентифікатори в sessionStorage
                 sessionStorage.setItem("email", formData.email);
                 sessionStorage.setItem("patient_id", nextPatientId);
                 sessionStorage.setItem("status", "patient");
-
             } else if (formData.role === 'doctor') {
-                // ===== РЕЄСТРАЦІЯ СПЕЦІАЛІСТА =====
                 const {data: lastDoctor, error: lastDoctorError} = await supabase
                     .from('doctors')
                     .select('doctor_id')
@@ -121,6 +148,8 @@ const CreateAccount = () => {
                     ? lastDoctor[0].doctor_id + 1
                     : 1;
 
+                const specializationValue = formData.specializations.join(', ');
+
                 const {error: insertError} = await supabase
                     .from('doctors')
                     .insert([
@@ -128,14 +157,26 @@ const CreateAccount = () => {
                             doctor_id: nextDoctorId,
                             first_name: formData.firstName,
                             last_name: formData.lastName,
-                            email: formData.email,
+                            specialization: specializationValue,
+                            experience: null,
+                            price_per_session: formData.pricePerSession
+                                ? Number(formData.pricePerSession)
+                                : null,
                             phone_number: formData.phone,
-                            city: formData.address,
+                            email: formData.email,
                             doc_login: formData.login,
                             doc_password: formData.password,
+                            meet_fomat: null,
+                            city: null,
+                            doc_photo: null,
                             doc_sex: genderInEnglish,
                             doc_date: formData.birthDate,
-                            // інші поля (specialization, meet_fomat і т.д.) можна редагувати пізніше в кабінеті
+                            doc_session: 0,
+                            doc_rev: 0,
+                            doc_lang: null,
+                            doc_about: null,
+                            doc_education: null,
+                            doc_way: null,
                         }
                     ]);
 
@@ -146,7 +187,6 @@ const CreateAccount = () => {
                 sessionStorage.setItem("status", "doctor");
             }
 
-            // Спроба надіслати вітальний лист (не ламаємо реєстрацію, якщо лист не відправився)
             try {
                 await fetch("http://localhost:4000/send-registration-email", {
                     method: "POST",
@@ -167,7 +207,6 @@ const CreateAccount = () => {
         }
     };
 
-
     return (
         <div className="createacc-page">
             <div className="logo">
@@ -182,7 +221,6 @@ const CreateAccount = () => {
                 </div>
 
                 <form onSubmit={handleSubmit}>
-                    {/* КРОК 1 */}
                     {currentStep === 1 && (
                         <>
                             <div className="input-container">
@@ -210,6 +248,7 @@ const CreateAccount = () => {
                                     Спеціаліст
                                 </label>
                             </div>
+
                             <div className="input-container">
                                 <input
                                     type="text"
@@ -231,33 +270,39 @@ const CreateAccount = () => {
                             </div>
 
                             <div className="input-container">
-                                <p>Оберіть свою стать: </p>
+                                <p>Оберіть свою стать:</p>
+
                                 <label>
                                     <input
-                                        type="checkbox"
+                                        type="radio"
                                         name="gender"
-                                        checked={formData.gender === 'male'}
-                                        onChange={() => setFormData({...formData, gender: 'male'})}
+                                        value="Чоловік"
+                                        checked={formData.gender === 'Чоловік'}
+                                        onChange={handleChange}
                                     />
                                     Чоловік
                                 </label>
+
                                 <label>
                                     <input
-                                        type="checkbox"
+                                        type="radio"
                                         name="gender"
-                                        checked={formData.gender === 'female'}
-                                        onChange={() => setFormData({...formData, gender: 'female'})}
+                                        value="Жінка"
+                                        checked={formData.gender === 'Жінка'}
+                                        onChange={handleChange}
                                     />
                                     Жінка
                                 </label>
+
                                 <label>
                                     <input
-                                        type="checkbox"
+                                        type="radio"
                                         name="gender"
-                                        checked={formData.gender === 'another'}
-                                        onChange={() => setFormData({...formData, gender: 'another'})}
+                                        value="Інше"
+                                        checked={formData.gender === 'Інше'}
+                                        onChange={handleChange}
                                     />
-                                    Інша
+                                    Інше
                                 </label>
                             </div>
 
@@ -276,7 +321,6 @@ const CreateAccount = () => {
                         </>
                     )}
 
-                    {/* КРОК 2 */}
                     {currentStep === 2 && (
                         <>
                             <div className="input-container">
@@ -299,15 +343,50 @@ const CreateAccount = () => {
                                 />
                             </div>
 
-                            <div className="input-container">
-                                <input
-                                    type="text"
-                                    placeholder="Адреса"
-                                    name="address"
-                                    value={formData.address}
-                                    onChange={handleChange}
-                                />
-                            </div>
+                            {formData.role === 'patient' && (
+                                <div className="input-container">
+                                    <input
+                                        type="text"
+                                        placeholder="Адреса"
+                                        name="address"
+                                        value={formData.address}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                            )}
+
+                            {formData.role === 'doctor' && (
+                                <div className="input-container">
+                                    <p>Спеціалізація:</p>
+
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.specializations.includes('Психолог')}
+                                            onChange={() => handleSpecializationChange('Психолог')}
+                                        />
+                                        Психолог
+                                    </label>
+
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.specializations.includes('Психіатр')}
+                                            onChange={() => handleSpecializationChange('Психіатр')}
+                                        />
+                                        Психіатр
+                                    </label>
+
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.specializations.includes('Психотерапевт')}
+                                            onChange={() => handleSpecializationChange('Психотерапевт')}
+                                        />
+                                        Психотерапевт
+                                    </label>
+                                </div>
+                            )}
 
                             <button type="button" className="prev-button" onClick={prevStep}>
                                 Назад
@@ -318,7 +397,6 @@ const CreateAccount = () => {
                         </>
                     )}
 
-                    {/* КРОК 3 */}
                     {currentStep === 3 && (
                         <>
                             <div className="input-container">

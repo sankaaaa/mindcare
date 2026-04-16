@@ -87,21 +87,26 @@ const AllTherapistsPage = () => {
                         ? doctor.specialization.split(',').map(prof => prof.trim())
                         : [];
 
-                    let location = doctor.meet_fomat;
-                    if (doctor.meet_fomat.includes('Офлайн')) {
-                        location = doctor.meet_fomat.replace('Офлайн', `Офлайн: ${doctor.city}`);
+                    const meetFormat = doctor.meet_fomat || 'Формат не вказано';
+                    const city = doctor.city || '';
+                    const gender = doctor.doc_sex || 'Не вказано';
+                    const photo = doctor.doc_photo || '';
+
+                    let location = meetFormat;
+                    if (meetFormat.includes('Офлайн') && city) {
+                        location = meetFormat.replace('Офлайн', `Офлайн: ${city}`);
                     }
 
                     return {
                         doctor_id: doctor.doctor_id,
                         name: `${doctor.first_name} ${doctor.last_name}`,
-                        experience: formatExperience(doctor.experience),
-                        location: location,
-                        professions: professions,
+                        experience: doctor.experience ? formatExperience(doctor.experience) : 'Досвід не вказано',
+                        location,
+                        professions,
                         specialties: doctorSpecialties,
-                        photo: doctor.doc_photo,
-                        gender: doctor.doc_sex,
-                        meetFormat: doctor.meet_fomat,
+                        photo,
+                        gender,
+                        meetFormat,
                     };
                 });
 
@@ -136,8 +141,12 @@ const AllTherapistsPage = () => {
     const filteredTherapists = therapists.filter(therapist =>
         (selectedCategories.length === 0 || therapist.specialties.some(specialty => selectedCategories.includes(specialty))) &&
         (selectedSpecializations.length === 0 || therapist.professions.some(prof => selectedSpecializations.includes(prof))) &&
-        (selectedGender.length === 0 || selectedGender.includes('Не важливо') || selectedGender.includes(therapist.gender)) &&
-        (selectedMeetFormat.length === 0 || selectedMeetFormat.includes('Не важливо') || selectedMeetFormat.includes(therapist.meetFormat)) &&
+        (selectedGender.length === 0 ||
+            selectedGender.includes('Не важливо') ||
+            selectedGender.includes(therapist.gender || '')) &&
+        (selectedMeetFormat.length === 0 ||
+            selectedMeetFormat.includes('Не важливо') ||
+            selectedMeetFormat.includes(therapist.meetFormat || '')) &&
         therapist.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 

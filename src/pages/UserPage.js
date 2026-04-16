@@ -332,9 +332,9 @@ const UserPage = () => {
                                                 value={patientData.gender}
                                                 onChange={(e) => handleChange("gender", e.target.value)}
                                             >
-                                                <option value="male">Чоловік</option>
-                                                <option value="female">Жінка</option>
-                                                <option value="another">Інша</option>
+                                                <option value="Чоловік">Чоловік</option>
+                                                <option value="Жінка">Жінка</option>
+                                                <option value="Інше">Інше</option>
                                             </select>
                                         ) : patientData.gender}
                                     </p>
